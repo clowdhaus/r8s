@@ -8,7 +8,7 @@ async fn main() -> Result<(), anyhow::Error> {
     println!("{deprecated_versions:#?}");
 
     let client = Client::try_default().await?;
-    let current_versions = versions::Current::get(&client).await?;
+    let current_versions = versions::Cluster::get(&client).await?;
     println!("{current_versions:#?}");
 
     Ok(())

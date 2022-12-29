@@ -3,18 +3,16 @@ use kube::{discovery::Discovery, Client};
 use rust_embed::RustEmbed;
 use serde::Deserialize;
 
-// A version holds the information about a current API version
+// Holds the information about a current API version from the discovery API
 #[derive(Deserialize, Debug)]
-pub struct Version {
+pub struct DiscoveryVersion {
     // Name of the API version
     pub api_version: String,
     // Kind of the object associated with this version
     pub kind: String,
-    // DeprecatedIn indicates what version the API is deprecated in
-    // an empty string indicates that the version is not deprecated
 }
 
-// A version holds the information about a deprecated API version and potential replacement API
+// Holds the information about a deprecated API version and potential replacement API
 #[derive(Deserialize, Debug)]
 pub struct DeprecatedVersion {
     // Name of the API version
@@ -53,11 +51,11 @@ impl Deprecated {
 
 // Holds the deprecated API versions
 #[derive(Deserialize, Debug)]
-pub struct Current {
-    pub versions: Vec<Version>,
+pub struct Cluster {
+    pub versions: Vec<DiscoveryVersion>,
 }
 
-impl Current {
+impl Cluster {
     pub async fn get(client: &Client) -> Result<Self, anyhow::Error> {
         let mut versions = Vec::new();
 
@@ -80,7 +78,7 @@ impl Current {
                     format!("{}/{}", group.name(), res.version)
                 };
 
-                versions.push(Version {
+                versions.push(DiscoveryVersion {
                     api_version,
                     kind: res.kind,
                 })
@@ -94,6 +92,6 @@ impl Current {
             }
         }
 
-        Ok(Current { versions })
+        Ok(Cluster { versions })
     }
 }
