@@ -5,17 +5,17 @@ use kube::Client;
 
 #[tokio::main]
 async fn main() -> Result<(), anyhow::Error> {
+    // Loads that deprecated API data from local file
     let deprecated = deprecated::Deprecated::get()?;
-    // println!("{deprecated:#?}");
 
+    // Gets the APIs supported by the Kubernetes API server
     let client = Client::try_default().await?;
     let discovery = cluster::Discovery::get(&client).await?;
-    // println!("{discovery:#?}");
 
+    // Checks if any of the deprecated APIs are still supported by the API server
     for (key, value) in &deprecated.versions {
         if discovery.versions.contains_key(key) {
-            println!("{key} is deprecated");
-            println!("{value:#?}");
+            println!("DEPRECATED: {value:#?}");
         }
     }
 

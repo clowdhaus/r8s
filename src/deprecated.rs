@@ -27,21 +27,23 @@ pub type GroupVersionKind = String;
 
 /// Contains the deprecated API versions
 ///
-/// `Deprecated` holds a map of `GroupVersionKind`s (GVK) mapped to their repspective
-/// `DeprecatedVersion` struct for quick lookup to check if a GVK is in the map of
-/// deprecated versions or not
+/// `Deprecated` maps `GroupVersionKind`s (GVK) to their repspective
+/// `DeprecatedVersion` for quick lookup to check if a GVK is deprecated
 #[derive(Deserialize, Debug)]
 pub struct Deprecated {
-    /// Map of GroupVersionKind mapped to its respective deprecated version struct
+    /// Map of `GroupVersionKind`s to their respective `DeprecatedVersion`
     pub versions: HashMap<GroupVersionKind, DeprecatedVersion>,
 }
 
 /// Contains the static map of deprecated API versions in YAML format
+/// This is the source of truth for the APIs that have been identified as
+/// deprecated and/or removed as well as what versions those actions take effect
 #[derive(RustEmbed)]
 #[folder = "data/"]
 struct Data;
 
-/// Builds the map of `GroupVersionKinds` mapped to their respective `DeprecatedVersion` struct
+/// Loads the deprecated versions data from local yaml file and builds the
+/// map of `GroupVersionKind`s to their respective `DeprecatedVersion` (defined in the yaml file)
 impl Deprecated {
     pub fn get() -> Result<Self, anyhow::Error> {
         let deprecation_file = Data::get("deprecations.yaml").unwrap();

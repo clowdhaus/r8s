@@ -6,12 +6,16 @@ use serde::Deserialize;
 /// Represents a group/version/kind
 pub type GroupVersionKind = String;
 
-// Holds the deprecated API versions
+/// Contains the Kubernetes API versions supported by the API server
+///
+/// `Discovery` maps `GroupVersionKind`s (GVK) to their repspective
+/// `ApiResource` as returned by the `discovery` client
 #[derive(Deserialize, Debug)]
 pub struct Discovery {
     pub versions: HashMap<GroupVersionKind, ApiResource>,
 }
 
+/// Loads the Kubernetes API versions supported by the API server
 impl Discovery {
     pub async fn get(client: &Client) -> Result<Self, anyhow::Error> {
         let mut versions: HashMap<GroupVersionKind, ApiResource> = HashMap::new();
@@ -22,10 +26,6 @@ impl Discovery {
             // let vr = group.versioned_resources(group.preferred_version_or_latest());
 
             for (resource, _capabilities) in group.recommended_resources() {
-                // if resource.kind.eq("CSINode") {
-                //     println!("{:#?}", resource);
-                // }
-
                 let res = resource.clone();
                 let api_version = if group.name() == "" {
                     // "core" group does not have a group name, its left blank and only the version is used
